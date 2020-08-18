@@ -1,0 +1,21 @@
+{
+	"_comment": "Command Stuffs",
+	"command.heldmagic.skilltree.list": "已掌握的魔法：",
+	"command.heldmagic.skilltree.check.true": "玩家“%1$s”已掌握“%2$s”",
+	"command.heldmagic.skilltree.check.false": "玩家“%1$s”未掌握“%2$s”",
+	"command.heldmagic.skilltree.add.true": "玩家“%1$s”学会了“%2$s”",
+	"command.heldmagic.skilltree.add.false": "授予玩家技能失败，或许玩家“%1$s”已掌握“%2$s”",
+	"command.heldmagic.skilltree.remove.true": "玩家“%1$s”忘却了“%2$s”",
+	"command.heldmagic.skilltree.remove.false": "移除玩家技能失败，或许玩家“%1$s”未掌握“%2$s”",
+	
+	"text.heldmagic.magic_unknown": "不存在名为“%1$s”的魔法",
+	"text.heldmagic.fail.magic_locked": "玩家“%1$s”尚未掌握“%2$s”",
+	
+	"_comment":"Example Plugin",
+	"item.heldmagic.held_item":"手持魔法",
+	"heldmagic.heldmagic.example_holdable": "手持魔法栗子",
+	"heldmagic.heldmagic.example_holdable.info": "这是一个栗子",
+	"tooltip.heldmagic.helditem":"这是魔法。",
+	"tooltip.heldmagic.helditem.nbt":"NBT：%s",
+	"text.heldmagic.hm_feedback.equip": "吟唱完成 - %s"
+}
