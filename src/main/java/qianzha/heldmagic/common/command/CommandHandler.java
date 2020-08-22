@@ -21,6 +21,7 @@ public class CommandHandler {
 						.then(HoldableCommand.register(true)))
 				.then(HoldableCommand.register(false))
 				.then(SkillTreeCommand.register())
+				.then(GuiCommand.register())
 		);
 		dispatcher.register(Commands.literal("hm").redirect(cmd));
 	}

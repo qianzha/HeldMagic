@@ -1,5 +1,6 @@
 package qianzha.heldmagic.common.network;
 
+import java.util.Optional;
 import java.util.function.Supplier;
 
 import net.minecraft.network.NetworkManager;
@@ -10,12 +11,14 @@ import net.minecraftforge.fml.network.NetworkRegistry;
 import net.minecraftforge.fml.network.PacketDistributor.PacketTarget;
 import net.minecraftforge.fml.network.simple.SimpleChannel;
 import qianzha.heldmagic.common.HMConstants;
+import qianzha.heldmagic.common.network.msg.EqulpMagicMsg;
+import qianzha.heldmagic.common.network.msg.SwapSlotMsg;
+import qianzha.heldmagic.common.network.msg.UnequlpMagicMsg;
 import qianzha.heldmagic.util.HMLogger;
 
 public class HeldMagicPacketHandler {
 	private static final String PROTOCOL_VERSION = "1.0";
 	public static final SimpleChannel CHANNEL;
-	@SuppressWarnings("unused")
 	private static int cnt = 0;
 	
 	static {
@@ -24,6 +27,33 @@ public class HeldMagicPacketHandler {
 			PROTOCOL_VERSION::toString,
 			PROTOCOL_VERSION::equals,
 			PROTOCOL_VERSION::equals
+		);
+	}
+
+	public static void registerMessage() {
+		CHANNEL.registerMessage(
+				cnt++,
+				EqulpMagicMsg.class,
+				EqulpMagicMsg::encode,
+				EqulpMagicMsg::new,
+				EqulpMagicMsg::handle,
+				Optional.<NetworkDirection>of(NetworkDirection.PLAY_TO_SERVER)
+		);
+		CHANNEL.registerMessage(
+				cnt++,
+				SwapSlotMsg.class,
+				SwapSlotMsg::encode,
+				SwapSlotMsg::new,
+				SwapSlotMsg::handle,
+				Optional.<NetworkDirection>of(NetworkDirection.PLAY_TO_SERVER)
+		);
+		CHANNEL.registerMessage(
+				cnt++,
+				UnequlpMagicMsg.class,
+				UnequlpMagicMsg::encode,
+				UnequlpMagicMsg::new,
+				UnequlpMagicMsg::handle,
+				Optional.<NetworkDirection>of(NetworkDirection.PLAY_TO_SERVER)
 		);
 	}
 	
@@ -46,4 +76,5 @@ public class HeldMagicPacketHandler {
 	public <MSG> void sendTo(MSG message, NetworkManager manager, NetworkDirection direction) {
 		CHANNEL.sendTo(message, manager, direction);
 	}
+
 }

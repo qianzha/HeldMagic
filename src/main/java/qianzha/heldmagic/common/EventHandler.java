@@ -2,8 +2,10 @@ package qianzha.heldmagic.common;
 
 import net.minecraft.block.Block;
 import net.minecraft.entity.item.ItemEntity;
+import net.minecraft.inventory.container.ContainerType;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraftforge.common.extensions.IForgeContainerType;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.event.TickEvent.Phase;
 import net.minecraftforge.event.TickEvent.PlayerTickEvent;
@@ -12,6 +14,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
 import qianzha.heldmagic.api.unit.HMUtils;
+import qianzha.heldmagic.common.gui.SkillTreeContainer;
 import qianzha.heldmagic.common.plugin.test.item.ExampleHoldableMagicItem;
 import qianzha.heldmagic.util.HMLogger;
 
@@ -60,6 +63,12 @@ public class EventHandler {
 			} catch (ClassNotFoundException e) {
 				HMLogger.DEFAULT.info("HeldMagic API has not been loaded. ");
 			}
+        }
+        
+    	@SubscribeEvent
+    	public static void registerContainers (RegistryEvent.Register<ContainerType<?>> event) {
+            event.getRegistry().register(IForgeContainerType.create(SkillTreeContainer::createByPacket)
+            		.setRegistryName(HMConstants.MODID, "skilltree_container"));
         }
     }
     

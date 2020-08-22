@@ -13,7 +13,7 @@ import com.mojang.brigadier.suggestion.SuggestionProvider;
 
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.ISuggestionProvider;
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.TranslationTextComponent;
 import qianzha.heldmagic.api.magic.IHoldableMagic;
@@ -33,7 +33,7 @@ public class HoldableArgument implements ArgumentType<HoldableInput>{
 		CommandSource source = context.getSource();
 		Stream<String> stream;
 		try {
-			PlayerEntity player = source.asPlayer();
+			ServerPlayerEntity player = source.asPlayer();
 			stream = HMUtils.listMagic(player).map(HMUtils::magicStringId);
 		} catch (CommandSyntaxException e) {
 			stream = HMUtils.listMagic(null).map(HMUtils::magicStringId);

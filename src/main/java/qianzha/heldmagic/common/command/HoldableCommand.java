@@ -7,7 +7,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.Commands;
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.util.Hand;
 import net.minecraftforge.server.command.EnumArgument;
 import qianzha.heldmagic.api.unit.HMUtils;
@@ -33,7 +33,7 @@ public class HoldableCommand {
 	}
 	
 	public static int doTest(CommandContext<CommandSource> context, HoldableInput magic, Hand hand) throws CommandSyntaxException {
-		PlayerEntity player = context.getSource().asPlayer();
+		ServerPlayerEntity player = context.getSource().asPlayer();
 		if(magic.isListAll()) {
 			HMUtils.equipHoldableWithoutCheck(magic.getHoldable(), player, hand);
 		}

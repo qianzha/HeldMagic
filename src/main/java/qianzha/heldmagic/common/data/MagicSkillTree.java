@@ -1,25 +1,34 @@
 package qianzha.heldmagic.common.data;
 
 import java.util.Set;
+import java.util.SortedSet;
 import java.util.UUID;
 
 import com.google.common.collect.Sets;
 
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.inventory.container.Container;
+import net.minecraft.inventory.container.INamedContainerProvider;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.ListNBT;
 import net.minecraft.nbt.StringNBT;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraftforge.common.util.Constants.NBT;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.server.permission.PermissionAPI;
 import qianzha.heldmagic.api.magic.IHoldableMagic;
 import qianzha.heldmagic.api.magic.IMagicSkillTree;
+import qianzha.heldmagic.api.unit.HMUtils;
 import qianzha.heldmagic.common.HMConstants.Permission;
+import qianzha.heldmagic.common.gui.SkillTreeContainer;
 import qianzha.heldmagic.util.HMLogger;
 import qianzha.heldmagic.util.PlayerUtil;
 
-public class MagicSkillTree implements IMagicSkillTree, INBTSerializable<CompoundNBT> {
+public class MagicSkillTree implements IMagicSkillTree, INBTSerializable<CompoundNBT>, INamedContainerProvider {
 	private HMWorldSavedData parent;
 	private ServerPlayerEntity player;
 	private UUID playerUUID;
@@ -130,5 +139,25 @@ public class MagicSkillTree implements IMagicSkillTree, INBTSerializable<Compoun
 			set.add(new ResourceLocation(obj.getString()));
 		});
 	}
-
+	
+	// INamedContainerProvider
+	
+	@Override
+	public Container createMenu(int windowId, PlayerInventory playerInventory, PlayerEntity player) {
+		SortedSet<IHoldableMagic> unlocked = Sets.newTreeSet(HMUtils.MAGIC_COMPARATOR);
+		SortedSet<IHoldableMagic> locked = Sets.newTreeSet(HMUtils.MAGIC_COMPARATOR);
+		for(IHoldableMagic magic : HMUtils.getRegistedMagic()) {
+			if(isUnlocked(magic))
+				unlocked.add(magic);
+			else
+				locked.add(magic);
+		}
+		return new SkillTreeContainer(windowId, player, unlocked, locked);
+	}
+	
+	@Override
+	public ITextComponent getDisplayName() {
+		return new TranslationTextComponent("gui.heldmagic.skilltree.title");
+	}
+	
 }

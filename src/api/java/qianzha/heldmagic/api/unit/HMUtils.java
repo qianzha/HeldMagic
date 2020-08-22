@@ -2,11 +2,14 @@ package qianzha.heldmagic.api.unit;
 
 import java.util.stream.Stream;
 
+import com.google.common.collect.ImmutableList;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.Dynamic2CommandExceptionType;
 
 import net.minecraft.command.CommandException;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.Hand;
@@ -23,20 +26,21 @@ public class HMUtils {
 	public static final String NBT_HELDING_SAVED = "qzhm_replace";
 	@HeldMagicPlugin.ApiInstance
 	public static IHeldMagicAPI API;
-	public static Dynamic2CommandExceptionType DCET_NOT_UNLOCKED = new Dynamic2CommandExceptionType((player, magic) -> {
+	public static final MagicComparator MAGIC_COMPARATOR = MagicComparator.INSTANCE;
+	public static final Dynamic2CommandExceptionType DCET_NOT_UNLOCKED = new Dynamic2CommandExceptionType((player, magic) -> {
 		return new TranslationTextComponent("text.heldmagic.fail.magic_locked", player, magic);
 	});
 	
 	
-	public static boolean isUnlocked(PlayerEntity player, IHoldableMagic magic) {
+	public static boolean isUnlocked(ServerPlayerEntity player, IHoldableMagic magic) {
 		return API.getSkillTree(player).isUnlocked(magic);
 	}
 	
-	public static boolean addUnlock(PlayerEntity player, IHoldableMagic magic) {
+	public static boolean addUnlock(ServerPlayerEntity player, IHoldableMagic magic) {
 		return API.getSkillTree(player).addUnlocked(magic);
 	}
 	
-	public static boolean removeUnlocked(PlayerEntity player, IHoldableMagic magic) {
+	public static boolean removeUnlocked(ServerPlayerEntity player, IHoldableMagic magic) {
 		return API.getSkillTree(player).removeUnlocked(magic);
 	}
 	
@@ -52,26 +56,42 @@ public class HMUtils {
 		return new TranslationTextComponent(API.getTranslateKey(magic));
 	}
 	
-	public static Stream<IHoldableMagic> listMagic(PlayerEntity player) {
+	public static Stream<IHoldableMagic> listMagic(ServerPlayerEntity player) {
 		if(player == null)
-			return Stream.of(getRegistedMagic());
+			return getRegistedMagic().stream();
 		else
-			return Stream.of(getRegistedMagic()).filter(magic -> API.getSkillTree(player).isUnlocked(magic));
+			return getRegistedMagic().stream().filter(magic -> API.getSkillTree(player).isUnlocked(magic));
 	}
 	
-	public static IHoldableMagic[] getRegistedMagic() {
-		final IHoldableMagic[] values = API.getHoldableRegistration().getMagicCollection().toArray(new IHoldableMagic[] {});
-		return values;
+	public static ImmutableList<IHoldableMagic>  getRegistedMagic() {
+		return API.getHoldableRegistration().getMagicList();
 	}
 	
-	public static void equipHoldable(IHoldableMagic holdable, PlayerEntity player, Hand hand) throws CommandException, CommandSyntaxException {
-		if(!isUnlocked(player, holdable)) throw DCET_NOT_UNLOCKED.create(player.getName(), holdable.getRegistryName());
-		if(!holdable.canEquip(player)) throw new CommandException(holdable.cannontEquipInfo(player));
+	public static void checkMagic(IHoldableMagic magic, ServerPlayerEntity player) throws CommandException, CommandSyntaxException {
+		if(!isUnlocked(player, magic)) throw DCET_NOT_UNLOCKED.create(player.getName(), magic.getRegistryName());
+		if(!magic.canEquip(player)) throw new CommandException(magic.cannontEquipInfo(player));
+	}
+	
+	
+	public static void equipHoldable(IHoldableMagic holdable, ServerPlayerEntity player, Hand hand) throws CommandException, CommandSyntaxException {
+		checkMagic(holdable, player);
 		equipHoldableWithoutCheck(holdable, player, hand);
 	}
 	
 	public static void equipHoldableWithoutCheck(IHoldableMagic holdable, PlayerEntity player, Hand hand) {	
-		ItemStack toReplace = player.getHeldItem(hand);
+		ItemStack toHold = replace(holdable, player.getHeldItem(hand));
+		player.setHeldItem(hand, toHold);
+		holdable.equipFeedback(player);
+	}
+	
+	public static void equipMagic(IHoldableMagic magic, ServerPlayerEntity player, int slotIndex) throws CommandException, CommandSyntaxException {
+		checkMagic(magic, player);
+		PlayerInventory inv = player.inventory;
+		inv.setInventorySlotContents(slotIndex, replace(magic, inv.getStackInSlot(slotIndex)));
+		magic.equipFeedback(player);
+	}
+	
+	public static ItemStack replace(IHoldableMagic holdable, ItemStack toReplace) {
 		ItemStack toHold = new ItemStack(holdable.getItem(), 1);
 		toHold.setDisplayName(new TranslationTextComponent(API.getTranslateKey(holdable)).applyTextStyle(TextFormatting.LIGHT_PURPLE));
 		CompoundNBT nbtRoot = toHold.getOrCreateTag();
@@ -84,8 +104,7 @@ public class HMUtils {
 		else if (!toReplace.isEmpty()) {
 			toHold.getOrCreateTag().put(NBT_HELDING_SAVED, toReplace.serializeNBT());
 		}
-		player.setHeldItem(hand, toHold);
-		holdable.equipFeedback(player);
+		return toHold;
 	}
 	
 	public static ItemStack getSavingStack(ItemStack stack) {

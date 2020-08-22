@@ -17,6 +17,8 @@ import net.minecraftforge.server.permission.PermissionAPI;
 import qianzha.heldmagic.common.EventHandler;
 import qianzha.heldmagic.common.HMConstants;
 import qianzha.heldmagic.common.command.CommandHandler;
+import qianzha.heldmagic.common.gui.HeldMagicContainers;
+import qianzha.heldmagic.common.network.HeldMagicPacketHandler;
 import qianzha.heldmagic.config.CommonConfig;
 import qianzha.heldmagic.util.HMLogger;
 import qianzha.heldmagic.util.PluginUtil;
@@ -54,14 +56,14 @@ public class HeldMagic
         PluginUtil.load();
         PermissionAPI.registerNode(HMConstants.Permission.UNLOCKED_ALL, DefaultPermissionLevel.NONE, "Unlocked all magic. ");
         PermissionAPI.registerNode(HMConstants.Permission.ALTER, DefaultPermissionLevel.OP, "Alter skill tree. ");
-        
-//        HeldMagicPacketHandler.registerMessage();
+        HeldMagicPacketHandler.registerMessage();
 //        HMLogger.DEBUG.info("DIRT BLOCK >> {}", Blocks.DIRT.getRegistryName());
     }
 
     private void doClientStuff(final FMLClientSetupEvent event) {
         // do something that can only be done on the client
     	HMLogger.DEBUG.info("Got game settings {}", event.getMinecraftSupplier().get().gameSettings);
+    	HeldMagicContainers.registerScreenFactory();
     }
     
     private void enqueueIMC(final InterModEnqueueEvent event)

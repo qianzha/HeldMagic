@@ -2,8 +2,8 @@ package qianzha.heldmagic.common.api.impl;
 
 import java.util.UUID;
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.world.World;
+import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.world.server.ServerWorld;
 import qianzha.heldmagic.api.IHeldMagicAPI;
 import qianzha.heldmagic.api.magic.IMagicSkillTree;
 import qianzha.heldmagic.api.registration.IHoldableRegistration;
@@ -19,11 +19,11 @@ public enum HeldMagicAPI implements IHeldMagicAPI {
 		return holdableManager;
 	}
 
-	public IMagicSkillTree getSkillTree(PlayerEntity player) {
-		return getSkillTree(player.world, player.getGameProfile().getId());
+	public IMagicSkillTree getSkillTree(ServerPlayerEntity player) {
+		return getSkillTree((ServerWorld) player.world, player.getGameProfile().getId());
 	}
 	
-	public IMagicSkillTree getSkillTree(World worldIn, UUID player) {
+	public IMagicSkillTree getSkillTree(ServerWorld worldIn, UUID player) {
 		HMWorldSavedData data = HMWorldSavedData.getSavedData(worldIn);
 		return data.getSkillTree(player);
 	}

@@ -12,7 +12,10 @@ public class HMPlugin implements IHeldMagicPlugin {
 	
 	@Override
 	public void register(IHeldMagicAPI api) {
-		api.getHoldableRegistration().register(HoldableMagic.EXAMPLE);
+//		api.getHoldableRegistration().register(HoldableMagic.EXAMPLE);
+		for(HoldableMagic magic : HoldableMagic.values() ) {
+			api.getHoldableRegistration().register(magic);
+		}
 	}
 	
 }
